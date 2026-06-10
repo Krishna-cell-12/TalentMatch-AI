@@ -1,0 +1,33 @@
+Job Title: Senior Backend Engineer
+
+Location: Remote (US-based)
+Company: TechNova Inc.
+
+About the Role:
+We are looking for a Senior Backend Engineer to join our Platform Engineering team. You will be responsible for designing, building, and maintaining scalable backend services that power our SaaS platform used by over 10,000 enterprise customers worldwide.
+
+Responsibilities:
+- Design and develop RESTful APIs and microservices using Python and FastAPI
+- Architect and optimize PostgreSQL and Redis-based data layers
+- Build and maintain CI/CD pipelines using GitHub Actions and Docker
+- Collaborate with frontend engineers to define API contracts
+- Mentor junior engineers and lead code reviews
+- Participate in on-call rotations and incident response
+- Drive technical design discussions and contribute to engineering RFCs
+
+Requirements:
+- 5+ years of professional backend development experience
+- Strong proficiency in Python (FastAPI, Django, or Flask)
+- Deep experience with relational databases (PostgreSQL preferred)
+- Solid understanding of distributed systems and microservices architecture
+- Experience with containerization (Docker) and orchestration (Kubernetes)
+- Familiarity with cloud platforms (AWS or GCP)
+- Strong communication and collaboration skills
+- BS/MS in Computer Science or equivalent experience
+
+Nice to Have:
+- Experience with event-driven architectures (Kafka, RabbitMQ)
+- Familiarity with GraphQL
+- Experience with infrastructure-as-code tools (Terraform, Pulumi)
+- Contributions to open source projects
+- Experience in a high-growth startup environment

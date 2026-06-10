@@ -1,0 +1,16 @@
+# Environments
+venv/
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE files
+.vscode/
+.idea/
+
+# Local data outputs (optional, keep if you want to show sample output)
+src/phase1/parsed_jd.json
+src/phase2/top_candidates.csv
