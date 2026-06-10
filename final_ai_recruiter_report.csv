@@ -1,0 +1,21 @@
+final_rank,candidate_id,title,llm_score,recruiter_notes
+1,CAND_0025206,QA Engineer,10,"Lacking required seniority and technical skills, with only 2 years of experience and no background in Python, FastAPI, or relational databases — poor match."
+2,CAND_0000397,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
+3,CAND_0008900,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+4,CAND_0011686,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+5,CAND_0015900,Software Engineer,0,Evaluation skipped: daily API token limit reached.
+6,CAND_0027333,DevOps Engineer,0,Evaluation skipped: daily API token limit reached.
+7,CAND_0036843,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+8,CAND_0046676,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
+9,CAND_0055283,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+10,CAND_0055701,Software Engineer,0,Evaluation skipped: daily API token limit reached.
+11,CAND_0060950,QA Engineer,0,Evaluation skipped: daily API token limit reached.
+12,CAND_0065556,QA Engineer,0,Evaluation skipped: daily API token limit reached.
+13,CAND_0071930,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+14,CAND_0080222,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+15,CAND_0082697,QA Engineer,0,Evaluation skipped: daily API token limit reached.
+16,CAND_0085776,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
+17,CAND_0087170,QA Engineer,0,Evaluation skipped: daily API token limit reached.
+18,CAND_0089032,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
+19,CAND_0089659,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
+20,CAND_0098155,QA Engineer,0,Evaluation skipped: daily API token limit reached.

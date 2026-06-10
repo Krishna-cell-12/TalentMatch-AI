@@ -1,0 +1,101 @@
+candidate_id,rank,score,reasoning
+CAND_0025206,1,1.0000,"Lacking required seniority and technical skills, with only 2 years of experience and no background in Python, FastAPI, or relational databases — poor match."
+CAND_0000397,2,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0008900,3,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0011686,4,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0015900,5,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0027333,6,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0036843,7,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0046676,8,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0055283,9,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0055701,10,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0060950,11,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0065556,12,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0071930,13,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0080222,14,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0082697,15,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0085776,16,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0087170,17,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0089032,18,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0089659,19,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0098155,20,0.5050,Evaluation skipped: daily API token limit reached.
+CAND_0025152,21,0.5000,Frontend Engineer with 1.3 yrs; 3 matching skills; response rate 0.22.
+CAND_0062030,22,0.4937,Frontend Engineer with 6.6 yrs; 2 matching skills; response rate 0.39.
+CAND_0075324,23,0.4875,Frontend Engineer with 6.0 yrs; 2 matching skills; response rate 0.61.
+CAND_0074141,24,0.4812,QA Engineer with 8.7 yrs; 1 matching skills; response rate 0.43.
+CAND_0021178,25,0.4749,Cloud Engineer with 6.5 yrs; 2 matching skills; response rate 0.51.
+CAND_0090777,26,0.4687,Software Engineer with 6.8 yrs; 5 matching skills; response rate 0.43.
+CAND_0026947,27,0.4624,Cloud Engineer with 3.8 yrs; 1 matching skills; response rate 0.25.
+CAND_0029849,28,0.4561,Frontend Engineer with 3.1 yrs; 1 matching skills; response rate 0.12.
+CAND_0028267,29,0.4499,Frontend Engineer with 7.3 yrs; 0 matching skills; response rate 0.60.
+CAND_0040093,30,0.4436,DevOps Engineer with 8.3 yrs; 0 matching skills; response rate 0.64.
+CAND_0000599,31,0.4373,QA Engineer with 7.8 yrs; 0 matching skills; response rate 0.73.
+CAND_0049123,32,0.4311,Frontend Engineer with 5.3 yrs; 0 matching skills; response rate 0.17.
+CAND_0028984,33,0.4248,QA Engineer with 7.9 yrs; 2 matching skills; response rate 0.36.
+CAND_0037085,34,0.4185,Frontend Engineer with 3.7 yrs; 2 matching skills; response rate 0.64.
+CAND_0023225,35,0.4123,QA Engineer with 5.8 yrs; 3 matching skills; response rate 0.43.
+CAND_0096702,36,0.4060,QA Engineer with 5.5 yrs; 3 matching skills; response rate 0.42.
+CAND_0009377,37,0.3997,QA Engineer with 3.9 yrs; 2 matching skills; response rate 0.82.
+CAND_0049674,38,0.3935,DevOps Engineer with 2.0 yrs; 0 matching skills; response rate 0.68.
+CAND_0074022,39,0.3872,QA Engineer with 9.3 yrs; 1 matching skills; response rate 0.63.
+CAND_0093712,40,0.3809,QA Engineer with 7.3 yrs; 1 matching skills; response rate 0.81.
+CAND_0008035,41,0.3747,DevOps Engineer with 6.1 yrs; 1 matching skills; response rate 0.68.
+CAND_0013581,42,0.3684,Frontend Engineer with 4.3 yrs; 1 matching skills; response rate 0.39.
+CAND_0034555,43,0.3622,Cloud Engineer with 7.9 yrs; 1 matching skills; response rate 0.44.
+CAND_0077993,44,0.3559,QA Engineer with 3.8 yrs; 0 matching skills; response rate 0.17.
+CAND_0034072,45,0.3496,QA Engineer with 9.3 yrs; 1 matching skills; response rate 0.41.
+CAND_0086125,46,0.3434,QA Engineer with 6.7 yrs; 2 matching skills; response rate 0.64.
+CAND_0069770,47,0.3371,Frontend Engineer with 3.0 yrs; 0 matching skills; response rate 0.43.
+CAND_0095806,48,0.3308,QA Engineer with 9.2 yrs; 1 matching skills; response rate 0.45.
+CAND_0024012,49,0.3246,Frontend Engineer with 7.9 yrs; 0 matching skills; response rate 0.14.
+CAND_0023251,50,0.3183,Frontend Engineer with 9.7 yrs; 1 matching skills; response rate 0.51.
+CAND_0093304,51,0.3120,Cloud Engineer with 3.4 yrs; 0 matching skills; response rate 0.65.
+CAND_0026277,52,0.3058,QA Engineer with 10.0 yrs; 1 matching skills; response rate 0.79.
+CAND_0084721,53,0.2995,QA Engineer with 3.4 yrs; 2 matching skills; response rate 0.61.
+CAND_0034947,54,0.2932,Frontend Engineer with 9.9 yrs; 2 matching skills; response rate 0.69.
+CAND_0033232,55,0.2870,QA Engineer with 9.7 yrs; 1 matching skills; response rate 0.47.
+CAND_0057765,56,0.2807,Frontend Engineer with 4.7 yrs; 0 matching skills; response rate 0.44.
+CAND_0035385,57,0.2744,QA Engineer with 1.3 yrs; 1 matching skills; response rate 0.54.
+CAND_0021271,58,0.2682,QA Engineer with 6.4 yrs; 0 matching skills; response rate 0.32.
+CAND_0087960,59,0.2619,Frontend Engineer with 9.0 yrs; 1 matching skills; response rate 0.53.
+CAND_0008998,60,0.2556,Frontend Engineer with 7.2 yrs; 1 matching skills; response rate 0.27.
+CAND_0068424,61,0.2494,Cloud Engineer with 5.9 yrs; 2 matching skills; response rate 0.49.
+CAND_0039277,62,0.2431,Frontend Engineer with 5.4 yrs; 1 matching skills; response rate 0.63.
+CAND_0048678,63,0.2368,Frontend Engineer with 9.7 yrs; 1 matching skills; response rate 0.19.
+CAND_0014463,64,0.2306,Frontend Engineer with 8.4 yrs; 2 matching skills; response rate 0.43.
+CAND_0081277,65,0.2243,Frontend Engineer with 3.1 yrs; 3 matching skills; response rate 0.18.
+CAND_0002035,66,0.2180,QA Engineer with 7.4 yrs; 2 matching skills; response rate 0.75.
+CAND_0034261,67,0.2118,Frontend Engineer with 3.9 yrs; 1 matching skills; response rate 0.15.
+CAND_0063712,68,0.2055,DevOps Engineer with 9.8 yrs; 0 matching skills; response rate 0.82.
+CAND_0092772,69,0.1992,Frontend Engineer with 8.8 yrs; 0 matching skills; response rate 0.37.
+CAND_0014935,70,0.1930,Frontend Engineer with 7.6 yrs; 1 matching skills; response rate 0.37.
+CAND_0071560,71,0.1867,Frontend Engineer with 9.6 yrs; 1 matching skills; response rate 0.59.
+CAND_0071646,72,0.1804,Cloud Engineer with 8.8 yrs; 0 matching skills; response rate 0.31.
+CAND_0039072,73,0.1742,QA Engineer with 9.5 yrs; 0 matching skills; response rate 0.64.
+CAND_0059058,74,0.1679,Frontend Engineer with 7.4 yrs; 1 matching skills; response rate 0.18.
+CAND_0019723,75,0.1616,Frontend Engineer with 1.7 yrs; 0 matching skills; response rate 0.22.
+CAND_0039555,76,0.1554,QA Engineer with 5.2 yrs; 0 matching skills; response rate 0.49.
+CAND_0001431,77,0.1491,DevOps Engineer with 4.4 yrs; 0 matching skills; response rate 0.15.
+CAND_0056138,78,0.1428,QA Engineer with 1.3 yrs; 0 matching skills; response rate 0.44.
+CAND_0029429,79,0.1366,Software Engineer with 1.8 yrs; 0 matching skills; response rate 0.58.
+CAND_0004362,80,0.1303,Frontend Engineer with 7.4 yrs; 1 matching skills; response rate 0.59.
+CAND_0084101,81,0.1241,Frontend Engineer with 5.7 yrs; 0 matching skills; response rate 0.20.
+CAND_0011028,82,0.1178,QA Engineer with 8.9 yrs; 0 matching skills; response rate 0.74.
+CAND_0073440,83,0.1115,Software Engineer with 6.7 yrs; 1 matching skills; response rate 0.52.
+CAND_0031348,84,0.1053,Java Developer with 3.9 yrs; 1 matching skills; response rate 0.25.
+CAND_0042686,85,0.0990,QA Engineer with 7.3 yrs; 3 matching skills; response rate 0.57.
+CAND_0069521,86,0.0927,QA Engineer with 5.9 yrs; 0 matching skills; response rate 0.36.
+CAND_0012701,87,0.0865,Frontend Engineer with 2.9 yrs; 2 matching skills; response rate 0.63.
+CAND_0038259,88,0.0802,Frontend Engineer with 6.4 yrs; 0 matching skills; response rate 0.69.
+CAND_0091891,89,0.0739,QA Engineer with 9.4 yrs; 2 matching skills; response rate 0.10.
+CAND_0013957,90,0.0677,Frontend Engineer with 6.3 yrs; 1 matching skills; response rate 0.48.
+CAND_0094708,91,0.0614,Frontend Engineer with 4.4 yrs; 1 matching skills; response rate 0.48.
+CAND_0046769,92,0.0551,Frontend Engineer with 6.1 yrs; 0 matching skills; response rate 0.12.
+CAND_0067570,93,0.0489,Frontend Engineer with 1.2 yrs; 1 matching skills; response rate 0.65.
+CAND_0096762,94,0.0426,QA Engineer with 6.2 yrs; 2 matching skills; response rate 0.18.
+CAND_0055443,95,0.0363,QA Engineer with 1.0 yrs; 0 matching skills; response rate 0.22.
+CAND_0039812,96,0.0301,Software Engineer with 6.2 yrs; 0 matching skills; response rate 0.35.
+CAND_0087672,97,0.0238,Frontend Engineer with 2.2 yrs; 0 matching skills; response rate 0.42.
+CAND_0037428,98,0.0175,DevOps Engineer with 4.7 yrs; 2 matching skills; response rate 0.80.
+CAND_0001654,99,0.0113,Frontend Engineer with 6.2 yrs; 1 matching skills; response rate 0.11.
+CAND_0038882,100,0.0050,Software Engineer with 9.0 yrs; 2 matching skills; response rate 0.70.
