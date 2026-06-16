@@ -1,21 +1,21 @@
 final_rank,candidate_id,title,llm_score,recruiter_notes
-1,CAND_0025206,QA Engineer,10,"Lacking required seniority and technical skills, with only 2 years of experience and no background in Python, FastAPI, or relational databases — poor match."
-2,CAND_0000397,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
-3,CAND_0008900,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-4,CAND_0011686,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-5,CAND_0015900,Software Engineer,0,Evaluation skipped: daily API token limit reached.
-6,CAND_0027333,DevOps Engineer,0,Evaluation skipped: daily API token limit reached.
-7,CAND_0036843,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-8,CAND_0046676,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
-9,CAND_0055283,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-10,CAND_0055701,Software Engineer,0,Evaluation skipped: daily API token limit reached.
-11,CAND_0060950,QA Engineer,0,Evaluation skipped: daily API token limit reached.
-12,CAND_0065556,QA Engineer,0,Evaluation skipped: daily API token limit reached.
-13,CAND_0071930,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-14,CAND_0080222,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-15,CAND_0082697,QA Engineer,0,Evaluation skipped: daily API token limit reached.
-16,CAND_0085776,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
-17,CAND_0087170,QA Engineer,0,Evaluation skipped: daily API token limit reached.
-18,CAND_0089032,Cloud Engineer,0,Evaluation skipped: daily API token limit reached.
-19,CAND_0089659,Frontend Engineer,0,Evaluation skipped: daily API token limit reached.
-20,CAND_0098155,QA Engineer,0,Evaluation skipped: daily API token limit reached.
+1,CAND_0021178,Cloud Engineer,30,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are crucial requirements for the Senior AI Engineer role."
+2,CAND_0027333,DevOps Engineer,30,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are core requirements for the Senior AI Engineer role."
+3,CAND_0040093,DevOps Engineer,30,"Candidate lacks production experience with embeddings-based retrieval systems and vector databases, despite having experience with Weaviate, which is a significant gap for the Senior AI Engineer role."
+4,CAND_0062030,Frontend Engineer,30,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are crucial must-have skills for the Senior AI Engineer role."
+5,CAND_0093712,QA Engineer,30,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are core requirements for the Senior AI Engineer role."
+6,CAND_0089659,Frontend Engineer,24,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are core requirements for the Senior AI Engineer role."
+7,CAND_0085776,Cloud Engineer,20,"Candidate lacks production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems, which are crucial must-have skills for the Senior AI Engineer role."
+8,CAND_0000397,Cloud Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+9,CAND_0000599,QA Engineer,0,"The candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, strong Python, and hands-on experience designing evaluation frameworks for ranking systems."
+10,CAND_0008900,Frontend Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, as well as hands-on experience designing evaluation frameworks for ranking systems."
+11,CAND_0025206,QA Engineer,0,Candidate lacks all must-have skills and has significantly less experience than the minimum required 5 years.
+12,CAND_0028267,Frontend Engineer,0,"The candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+13,CAND_0036843,Frontend Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, strong Python, and hands-on experience designing evaluation frameworks for ranking systems."
+14,CAND_0046676,Cloud Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+15,CAND_0055701,Software Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, as well as hands-on experience designing evaluation frameworks for ranking systems."
+16,CAND_0060950,QA Engineer,0,"The candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+17,CAND_0074141,QA Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+18,CAND_0075324,Frontend Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, as well as hands-on experience designing evaluation frameworks for ranking systems."
+19,CAND_0087170,QA Engineer,0,"The candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems, vector databases, and hands-on experience designing evaluation frameworks for ranking systems."
+20,CAND_0090777,Software Engineer,0,"Candidate lacks all must-have skills, including production experience with embeddings-based retrieval systems and vector databases, making them a poor fit for the Senior AI Engineer role."

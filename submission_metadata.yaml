@@ -1,0 +1,91 @@
+# Redrob Hackathon — Submission Metadata
+# TalentMatch-AI | Track 1: AI & Datathon Arena
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "CodeCreator"
+project_name: "TalentMatch-AI"
+
+primary_contact:
+  name: "Krishna Abhang"
+  email: "krishna.full24@gmail.com"
+  phone: "8605160117"  
+
+team_members:
+  - name: "Krishna Abhang"
+    email: "krishna.full24@gmail.com"        
+    role: "ML Engineer & System Architect"
+ 
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/Krishna-cell-12/TalentMatch-AI"
+
+sandbox_link: "https://huggingface.co/spaces/krishna12sk/TalentMatch-AI"
+
+reproduce_command: "python rank.py --candidates ./data/raw/candidates.jsonl --out ./submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Linux (Ubuntu)"
+  cpu_cores: 4
+  ram_gb: 16
+  python_version: "3.10"
+  os: "Ubuntu 22.04 LTS"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false   # rank.py is fully offline
+  pre_computation_required: true      # Phase 1 JD parsing requires GROQ_API_KEY (one-time)
+  pre_computation_time_minutes: 2     # Phase 1 takes ~30 seconds
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Gemini/Antigravity"   # Used for code assistance and review
+
+ai_usage_summary: |
+  Used AI coding assistant for code review, docstring generation, and
+  architectural discussion. All ML engineering decisions (scoring formula,
+  weights, hybrid scoring architecture, honeypot detection logic) were
+  designed and validated by the team. Candidate data was NOT fed to AI tools.
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  TalentMatch-AI is a 4-phase intelligent candidate ranking pipeline:
+
+  Phase 1 (pre-computation): Groq Llama-3.3-70B parses the job description
+  into structured signals (must-have skills, YoE, behavioral traits).
+
+  Phase 2 (optional, research): FAISS + sentence-transformers semantic search
+  over 100K profiles to build an initial candidate shortlist.
+
+  Phase 3: Multi-signal hybrid scoring engine combining semantic similarity
+  (45%), metadata signals — YoE compliance + title relevance + skill overlap
+  (40%), and behavioral signals — recruiter response rate (15%).
+
+  Phase 4 (optional, research): Groq LLM re-ranks the Top 20 candidates with
+  deep contextual reasoning, producing explainable recruiter notes.
+
+  For the offline ranking submission (rank.py), we use a pure CPU scoring
+  approach: metadata signals (YoE + title + skill overlap), behavioral signals
+  (recruiter response rate + activity), and platform signals (applications,
+  profile views, skill tests). Honeypot detection identifies profiles with
+  impossible career timelines or expertise-without-experience patterns.
+
+  Runtime: ~3-4 minutes for 100K candidates on a standard laptop CPU.
+  No API calls. No network. No GPU.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true        # rank.py implements honeypot detection
+  reproduction_tested: true

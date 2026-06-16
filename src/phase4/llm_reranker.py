@@ -1,3 +1,12 @@
+"""
+Phase 4: Expert LLM Re-Ranker & Submission Merger
+==================================================
+Takes the top-20 candidates from Phase 3 (hybrid_shortlist.csv),
+evaluates each with Groq Llama-3.3-70B as an expert recruiter,
+and merges the LLM-scored top-20 with the remaining 80 from the
+full submission.csv. Falls back to hybrid scores when the API
+daily token limit is reached so the submission is NEVER empty.
+"""
 import os
 import csv
 import json
@@ -14,24 +23,28 @@ from tqdm import tqdm
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
-PHASE2_CSV_PATH       = PROJECT_ROOT / "submission.csv"
+HYBRID_SHORTLIST_PATH = PROJECT_ROOT / "hybrid_shortlist.csv"   # Phase 3 output (top 20)
+FULL_SUBMISSION_PATH  = PROJECT_ROOT / "submission.csv"         # Phase 2 output (top 100)
 CANDIDATES_JSONL_PATH = PROJECT_ROOT / "data" / "raw" / "candidates.jsonl"
 PARSED_JD_PATH        = PROJECT_ROOT / "src" / "phase1" / "parsed_jd.json"
 FINAL_REPORT_PATH     = PROJECT_ROOT / "final_ai_recruiter_report.csv"
 VALIDATOR_SCRIPT      = PROJECT_ROOT / "data" / "raw" / "validate_submission.py"
 
-TOP_N_TO_ANALYZE = 20
+TOP_N_TO_ANALYZE = 20   # Number of candidates sent to LLM
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 # ===========================================================================
-# Stage 1 — Load Phase 2 submission.csv in full
+# Stage 1 — Load Phase 3 hybrid shortlist (top 20 with hybrid scores)
 # ===========================================================================
-def load_submission_csv(csv_path: Path) -> list[dict]:
+def load_hybrid_shortlist(path: Path) -> list[dict]:
+    """Load the Phase 3 shortlist that has hybrid_score as fallback."""
     rows = []
-    with open(csv_path, "r", encoding="utf-8") as f:
+    if not path.exists():
+        return rows
+    with open(path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             rows.append(row)
@@ -39,14 +52,25 @@ def load_submission_csv(csv_path: Path) -> list[dict]:
 
 
 # ===========================================================================
-# Stage 2 — Cache: load previously computed LLM scores (avoids re-burning
-#            daily API token quota when the report already exists)
+# Stage 2 — Load the full submission.csv (100 candidates from Phase 2)
+# ===========================================================================
+def load_full_submission(path: Path) -> list[dict]:
+    rows = []
+    with open(path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            rows.append(row)
+    return rows
+
+
+# ===========================================================================
+# Stage 3 — Cache: skip re-calling API for candidates already evaluated
 # ===========================================================================
 def load_cached_evaluations(report_path: Path) -> dict:
     """
-    Read final_ai_recruiter_report.csv written by any previous run.
-    Returns {candidate_id: {llm_score, recruiter_notes, title}} for every
-    row whose notes are NOT an error string.
+    Read final_ai_recruiter_report.csv from any previous run.
+    Returns {candidate_id: {llm_score, recruiter_notes, title}}
+    for every row whose notes are NOT an error string.
     """
     cache: dict = {}
     if not report_path.exists():
@@ -57,12 +81,17 @@ def load_cached_evaluations(report_path: Path) -> dict:
             for row in reader:
                 c_id  = row.get("candidate_id", "").strip()
                 notes = row.get("recruiter_notes", "")
-                # Skip rows that failed in a prior run
-                if not c_id or notes.startswith("Evaluation failed"):
+                # Skip rows that were skipped or failed
+                skip_phrases = [
+                    "Evaluation skipped",
+                    "Evaluation failed",
+                    "daily API token limit",
+                ]
+                if not c_id or any(p in notes for p in skip_phrases):
                     continue
                 try:
                     cache[c_id] = {
-                        "llm_score":      int(float(row.get("llm_score", 0))),
+                        "llm_score":       int(float(row.get("llm_score", 0))),
                         "recruiter_notes": notes,
                         "title":           row.get("title", ""),
                     }
@@ -74,7 +103,7 @@ def load_cached_evaluations(report_path: Path) -> dict:
 
 
 # ===========================================================================
-# Stage 3 — Fetch full profiles for candidates not already cached
+# Stage 4 — Fetch full profiles from candidates.jsonl
 # ===========================================================================
 def fetch_full_profiles(jsonl_path: Path, target_ids: list[str]) -> dict:
     profiles: dict = {}
@@ -93,6 +122,7 @@ def fetch_full_profiles(jsonl_path: Path, target_ids: list[str]) -> dict:
                         "skills":           [s.get("name") for s in cand.get("skills", [])],
                         "career_history":   cand.get("career_history", []),
                         "signals":          cand.get("redrob_signals", {}),
+                        "location":         cand.get("profile", {}).get("location", ""),
                     }
                     if len(profiles) == len(target_set):
                         break
@@ -102,30 +132,50 @@ def fetch_full_profiles(jsonl_path: Path, target_ids: list[str]) -> dict:
 
 
 # ===========================================================================
-# Stage 4 — LLM evaluation with smart retry / daily-limit detection
+# Stage 5 — LLM evaluation with retry + graceful fallback
 # ===========================================================================
-def evaluate_candidate_with_llm(jd: dict, candidate: dict) -> dict:
+def evaluate_candidate_with_llm(jd: dict, candidate: dict, fallback_score: float = 50) -> dict:
     """
-    Call Groq Llama-3.  Returns {"final_score": int, "recruiter_notes": str}.
-    • Per-minute rate limit  → wait 30 s and retry (up to 3 times).
-    • Daily token limit      → return score=0 immediately (retrying is useless).
-    • Any other error        → return score=0 with note.
+    Calls Groq Llama-3.3-70B to evaluate candidate fit.
+
+    Returns {"final_score": int, "recruiter_notes": str}.
+
+    • Per-minute rate limit  → waits 30s and retries up to 3 times.
+    • Daily token limit      → falls back to hybrid_score (NOT 0!) so the
+                               submission remains meaningful.
+    • Any other error        → falls back gracefully.
     """
-    system_prompt = """
-You are an elite, highly critical technical recruiter.
-Evaluate the candidate against the job description.
-Return ONLY a valid JSON object with exactly two keys:
-1. "final_score": An integer from 0 to 100 representing true fit.
-2. "recruiter_notes": A single, punchy sentence explaining exactly why they
-   are or aren't a perfect fit.
+    must_haves = ", ".join(jd.get("must_have_technical_skills", []))
+    nice_to_have = ", ".join(jd.get("nice_to_have_technical_skills", []))
+    min_yoe = jd.get("minimum_years_experience", "N/A")
+
+    system_prompt = f"""You are an elite, hyper-critical senior technical recruiter with 15+ years of experience.
+Your task: evaluate whether a candidate is a STRONG FIT for the target role.
+
+SCORING RUBRIC (be strict):
+- 85-100: Exceptional fit — has all must-have skills, meets/exceeds YoE, directly relevant titles
+- 70-84:  Strong fit — has most must-haves, close to required YoE, relevant background
+- 50-69:  Moderate fit — partial skills match, may have transferable experience
+- 30-49:  Weak fit — significant gaps in skills or experience
+- 0-29:   Poor fit — missing core requirements entirely
+
+MUST-HAVE SKILLS: {must_haves}
+NICE-TO-HAVE SKILLS: {nice_to_have}
+MINIMUM YEARS OF EXPERIENCE: {min_yoe}
+
+Return ONLY valid JSON with exactly two keys:
+1. "final_score": integer 0-100
+2. "recruiter_notes": ONE crisp sentence explaining the primary strength OR disqualifying gap
 """
+
     user_prompt = f"""
-JOB DESCRIPTION REQUIREMENTS:
+JOB DESCRIPTION:
 {json.dumps(jd, indent=2)}
 
 CANDIDATE PROFILE:
 {json.dumps(candidate, indent=2)}
 """
+
     MAX_RETRIES = 3
     for attempt in range(MAX_RETRIES):
         try:
@@ -138,28 +188,42 @@ CANDIDATE PROFILE:
                 temperature=0.1,
                 response_format={"type": "json_object"},
             )
-            return json.loads(resp.choices[0].message.content)
+            result = json.loads(resp.choices[0].message.content)
+            # Validate the response has what we need
+            if "final_score" in result and "recruiter_notes" in result:
+                return result
+            # If malformed, treat as error
+            raise ValueError(f"Unexpected response format: {result}")
         except Exception as exc:
             err = str(exc)
-            # Daily token quota (TPD) — no point retrying in the same run
-            if "tokens per day" in err or "TPD" in err:
+            # Daily token quota — fall back to hybrid score immediately
+            if "tokens per day" in err or "TPD" in err or "daily" in err.lower():
+                scaled = int(fallback_score * 100) if fallback_score <= 1.0 else int(fallback_score)
                 return {
-                    "final_score":     0,
-                    "recruiter_notes": "Evaluation skipped: daily API token limit reached.",
+                    "final_score":     scaled,
+                    "recruiter_notes": f"Auto-scored via hybrid engine (semantic + metadata + behavioral signals). Hybrid score: {fallback_score:.3f}",
                 }
             # Per-minute rate limit — wait and retry
             if "rate_limit_exceeded" in err and attempt < MAX_RETRIES - 1:
                 wait = 30 * (attempt + 1)
-                print(f"\n  ⏳ Per-minute rate limit — waiting {wait}s before retry {attempt+2}/{MAX_RETRIES}...")
+                print(f"\n  ⏳ Rate limit hit — waiting {wait}s before retry {attempt+2}/{MAX_RETRIES}...")
                 time.sleep(wait)
                 continue
-            # Anything else
-            return {"final_score": 0, "recruiter_notes": f"Evaluation failed: {exc}"}
-    return {"final_score": 0, "recruiter_notes": "Evaluation failed after max retries."}
+            # Anything else — graceful fallback
+            scaled = int(fallback_score * 100) if fallback_score <= 1.0 else int(fallback_score)
+            return {
+                "final_score":     scaled,
+                "recruiter_notes": f"Auto-scored via hybrid engine (API unavailable). Hybrid score: {fallback_score:.3f}",
+            }
+    scaled = int(fallback_score * 100) if fallback_score <= 1.0 else int(fallback_score)
+    return {
+        "final_score":     scaled,
+        "recruiter_notes": f"Auto-scored via hybrid engine (max retries exceeded). Hybrid score: {fallback_score:.3f}",
+    }
 
 
 # ===========================================================================
-# Stage 5 — Two-band score assignment (guarantees validator monotonicity)
+# Stage 6 — Two-band score assignment (guarantees validator monotonicity)
 # ===========================================================================
 def compute_banded_scores(
     reranked_top20: list[dict],
@@ -197,13 +261,12 @@ def compute_banded_scores(
 
 
 # ===========================================================================
-# Stage 6 — Safety net: forward-pass monotonicity enforcement
+# Stage 7 — Monotonicity safety net
 # ===========================================================================
 def enforce_monotonicity(rows: list[dict]) -> list[dict]:
     """
     Walk ranks in order and clamp each score to be ≤ the previous score.
-    This is a belt-and-suspenders guard; with proper banding it should never
-    actually change anything.
+    Belt-and-suspenders guard; with correct banding it never fires.
     """
     prev = float(rows[0]["_out_score"])
     for row in rows[1:]:
@@ -216,7 +279,7 @@ def enforce_monotonicity(rows: list[dict]) -> list[dict]:
 
 
 # ===========================================================================
-# Stage 7 — Save human-readable side report
+# Stage 8 — Save human-readable recruiter report
 # ===========================================================================
 def save_final_report(results: list[dict], report_path: Path):
     with open(report_path, "w", encoding="utf-8", newline="") as f:
@@ -228,25 +291,26 @@ def save_final_report(results: list[dict], report_path: Path):
 
 
 # ===========================================================================
-# Stage 8 — Merge & overwrite submission.csv
+# Stage 9 — Merge & overwrite submission.csv
 # ===========================================================================
 def merge_and_overwrite_submission(
     reranked_top20: list[dict],
     remaining_80:   list[dict],
     output_path:    Path,
 ):
-    # Attach a unified _out_score field to every row before monotonicity pass
+    # Build unified rows
     all_rows: list[dict] = []
     for r in reranked_top20:
+        reasoning = r["recruiter_notes"]
         all_rows.append({
             "candidate_id": r["candidate_id"],
-            "reasoning":    r["recruiter_notes"],
+            "reasoning":    reasoning,
             "_out_score":   r["final_score"],
         })
     for r in remaining_80:
         all_rows.append({
             "candidate_id": r["candidate_id"],
-            "reasoning":    r["reasoning"],
+            "reasoning":    r.get("reasoning", "Matched via semantic vector search."),
             "_out_score":   r["_final_score"],
         })
 
@@ -282,20 +346,40 @@ def main():
         sys.exit(1)
     with open(PARSED_JD_PATH, "r", encoding="utf-8") as f:
         jd = json.load(f)
+    print(f"\n[0/6] JD loaded: '{jd.get('role_title', '')}' "
+          f"({jd.get('minimum_years_experience', '?')} YoE min)")
 
-    # ── 2. Load Phase 2 submission.csv ──────────────────────────────────────
-    if not PHASE2_CSV_PATH.exists():
-        print(f"  ERROR: {PHASE2_CSV_PATH} not found. Run Phase 2 first.")
+    # ── 2. Load Phase 3 shortlist (top 20 with hybrid scores) ────────────────
+    if not HYBRID_SHORTLIST_PATH.exists():
+        print(f"  ERROR: {HYBRID_SHORTLIST_PATH} not found. Run Phase 3 first.")
+        sys.exit(1)
+    if not FULL_SUBMISSION_PATH.exists():
+        print(f"  ERROR: {FULL_SUBMISSION_PATH} not found. Run Phase 2 first.")
         sys.exit(1)
 
-    print(f"\n[1/6] Loading Phase 2 submission.csv...")
-    phase2_rows = load_submission_csv(PHASE2_CSV_PATH)
-    print(f"       → {len(phase2_rows)} candidates loaded.")
-
-    top_ids   = [row["candidate_id"] for row in phase2_rows[:TOP_N_TO_ANALYZE]]
+    print(f"\n[1/6] Loading Phase 3 hybrid shortlist...")
+    shortlist_rows = load_hybrid_shortlist(HYBRID_SHORTLIST_PATH)
+    top_ids = [row["candidate_id"] for row in shortlist_rows[:TOP_N_TO_ANALYZE]]
     top_id_set = set(top_ids)
 
-    # ── 3. Load evaluation cache (previous runs) ─────────────────────────────
+    # Build a lookup of hybrid_score per candidate for LLM fallback
+    hybrid_score_lookup: dict[str, float] = {}
+    for row in shortlist_rows:
+        try:
+            hybrid_score_lookup[row["candidate_id"]] = float(row["hybrid_score"])
+        except (KeyError, ValueError):
+            hybrid_score_lookup[row["candidate_id"]] = 0.5
+
+    print(f"       → {len(top_ids)} candidates in shortlist for LLM evaluation.")
+
+    # ── 3. Load full submission for tail-80 ──────────────────────────────────
+    print(f"\n[1b/6] Loading full submission.csv for tail candidates...")
+    all_submission_rows = load_full_submission(FULL_SUBMISSION_PATH)
+    remaining_80 = [r for r in all_submission_rows if r["candidate_id"] not in top_id_set]
+    remaining_80.sort(key=lambda r: int(r["rank"]))
+    print(f"       → {len(remaining_80)} tail candidates loaded.")
+
+    # ── 4. Load evaluation cache ─────────────────────────────────────────────
     print(f"\n[2/6] Checking evaluation cache ({FINAL_REPORT_PATH.name})...")
     cache = load_cached_evaluations(FINAL_REPORT_PATH)
     cached_ids   = [cid for cid in top_ids if cid in cache]
@@ -304,10 +388,8 @@ def main():
     if uncached_ids:
         print(f"       → {len(uncached_ids)} candidates need fresh API calls.")
 
-    # ── 4. Fetch profiles only for uncached candidates ───────────────────────
+    # ── 5. Build results from cache + fetch uncached ─────────────────────────
     raw_results: list[dict] = []
-
-    # Pre-populate from cache
     for c_id in cached_ids:
         c = cache[c_id]
         raw_results.append({
@@ -318,58 +400,54 @@ def main():
         })
 
     if uncached_ids:
-        print(f"\n[3/6] Fetching full profiles for {len(uncached_ids)} uncached candidates...")
+        print(f"\n[3/6] Fetching full profiles for {len(uncached_ids)} candidates...")
         profiles = fetch_full_profiles(CANDIDATES_JSONL_PATH, uncached_ids)
         print(f"       → {len(profiles)} profiles retrieved.")
 
-        print(f"\n[4/6] Llama-3.3-70B evaluating {len(uncached_ids)} uncached candidates...")
+        print(f"\n[4/6] Llama-3.3-70B evaluating {len(uncached_ids)} candidates...")
         for c_id in tqdm(uncached_ids, desc="  Evaluating"):
             candidate_data = profiles.get(c_id, {})
-            evaluation = evaluate_candidate_with_llm(jd, candidate_data)
+            fallback = hybrid_score_lookup.get(c_id, 0.5)
+            evaluation = evaluate_candidate_with_llm(jd, candidate_data, fallback_score=fallback)
             raw_results.append({
                 "candidate_id":    c_id,
                 "title":           candidate_data.get("title", "Unknown"),
-                "llm_score":       evaluation.get("final_score", 0),
-                "recruiter_notes": evaluation.get("recruiter_notes", "Evaluation error."),
+                "llm_score":       evaluation.get("final_score", int(fallback * 100)),
+                "recruiter_notes": evaluation.get("recruiter_notes", "Auto-scored."),
             })
             time.sleep(0.5)
     else:
         print(f"\n[3/6] Skipping profile fetch — all candidates served from cache.")
         print(f"\n[4/6] Skipping API calls — all evaluations loaded from cache.")
 
-    # ── 5. Sort Top-20 by LLM score (desc), ties broken by candidate_id ─────
+    # ── 6. Sort Top-20 by LLM score (desc), ties broken by candidate_id ─────
     raw_results.sort(key=lambda x: (-x["llm_score"], x["candidate_id"]))
 
-    # ── 6. Build tail-80 (Phase-2 rows not in top-20) ───────────────────────
-    remaining_80 = [
-        row for row in phase2_rows
-        if row["candidate_id"] not in top_id_set
-    ]
-    remaining_80.sort(key=lambda r: int(r["rank"]))
-
     # ── 7. Compute two-band scores ───────────────────────────────────────────
-    print(f"\n[5/6] Computing banded scores (top-20 → [0.505–1.000], tail-80 → [0.005–0.500])...")
+    print(f"\n[5/6] Computing banded scores "
+          f"(top-20 → [0.505–1.000], tail-80 → [0.005–0.500])...")
     reranked_top20, remaining_80 = compute_banded_scores(raw_results, remaining_80)
 
     # ── 8. Save side report then overwrite submission.csv ────────────────────
     save_final_report(reranked_top20, FINAL_REPORT_PATH)
-    print(f"       → Human-readable report saved to {FINAL_REPORT_PATH.name}")
+    print(f"       → Recruiter report saved to {FINAL_REPORT_PATH.name}")
 
     print(f"\n[6/6] Merging and overwriting submission.csv...")
-    merge_and_overwrite_submission(reranked_top20, remaining_80, PHASE2_CSV_PATH)
+    merge_and_overwrite_submission(reranked_top20, remaining_80, FULL_SUBMISSION_PATH)
 
     # ── Leaderboard preview ───────────────────────────────────────────────────
     print("\n🏆 Top 5 Candidates (LLM Re-Ranked):")
     for i, r in enumerate(reranked_top20[:5], start=1):
         print(f"   #{i}  {r['candidate_id']}  [{r['title']}]  "
-              f"LLM={r['llm_score']}/100  FinalScore={r['final_score']:.4f}")
+              f"LLM={r['llm_score']}/100  Score={r['final_score']:.4f}")
         print(f"       ↳ {r['recruiter_notes']}")
 
-    # ── Boundary check ────────────────────────────────────────────────────────
+    # ── Score boundary check ──────────────────────────────────────────────────
     min_top  = min(r["final_score"]   for r in reranked_top20)
     max_tail = max(float(r["_final_score"]) for r in remaining_80) if remaining_80 else 0
+    gap_ok = min_top > max_tail
     print(f"\n  Score boundary: min(top-20)={min_top:.4f}  max(tail-80)={max_tail:.4f}  "
-          f"→ {'✅ clean gap' if min_top > max_tail else '⚠️  overlap!'}")
+          f"→ {'✅ clean gap' if gap_ok else '⚠️  overlap!'}")
 
     # ── 9. Auto-validate ──────────────────────────────────────────────────────
     print(f"\n{'='*70}")
@@ -378,7 +456,7 @@ def main():
 
     if VALIDATOR_SCRIPT.exists():
         result = subprocess.run(
-            [sys.executable, str(VALIDATOR_SCRIPT), str(PHASE2_CSV_PATH)],
+            [sys.executable, str(VALIDATOR_SCRIPT), str(FULL_SUBMISSION_PATH)],
             capture_output=True, text=True,
         )
         if result.stdout.strip():
