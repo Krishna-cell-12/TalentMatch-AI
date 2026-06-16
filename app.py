@@ -671,7 +671,7 @@ SAMPLE_CANDIDATE_JSON = json.dumps(
 # ---------------------------------------------------------------------------
 # Build the interface
 # ---------------------------------------------------------------------------
-with gr.Blocks(css=CSS, title="TalentMatch-AI — Redrob Hackathon", theme=gr.themes.Base()) as demo:
+with gr.Blocks(css=CSS, title="TalentMatch-AI — Redrob Hackathon") as demo:
 
     gr.Markdown(HEADER_MD)
 
